@@ -1,0 +1,12 @@
+pipeline {
+    agent {
+        label: "dockeragent"
+    } 
+    stages {
+        stage('docker version') {
+            steps {
+                sh 'docker -v' 
+            }
+        }
+    }
+}
