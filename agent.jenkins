@@ -3,9 +3,33 @@ pipeline {
         label "dockeragent"
     } 
     stages {
-        stage('docker version') {
+        stage('Test') {
             steps {
-                sh 'docker -v' 
+                script {
+                    // Execute the Python script and capture the output
+                    def output = sh(script: 'python3 ./selenium.py', returnStdout: true).trim()
+                    // Print the output for debugging
+                    echo "Output from script: ${output}"
+                    // Check if the output contains "Google is alive!"
+                    if (output.contains("Google is alive!")) {
+                        echo "Google is alive! Proceeding to the next stage."
+                        // Set the flag to true
+                        GOOGLE_ALIVE = true
+                    } else {
+                        // Abort the pipeline
+                        error("Google is down or the page title has changed. Aborting the pipeline.")
+                    }
+                }
+            }
+        }
+        stage('Hello') {
+            when {
+                expression {
+                    return GOOGLE_ALIVE
+                }
+            }
+            steps {
+                echo 'Hello World'
             }
         }
     }
